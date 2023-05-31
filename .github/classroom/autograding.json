@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "Test ALL",
+      "setup": "",
+      "run": "python -m unittest discover -s test",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 5,
+      "points": 100
+    }
+  ]
+}
