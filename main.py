@@ -3,7 +3,9 @@
 import copy
 
 def is_valid_mais_rapido(board: list[list[int]], linha: int, coluna:int) -> bool: 
-    """Checa se a jogada é válida"""
+    """Checa se a jogada é válida.
+    Ou seja, vê se uma alteração é válida checado a linha, a coluna e o setor da célula após a jogada.
+    """
     # checando linha
     if not checa_setor(board[linha]):
         return False
@@ -14,7 +16,7 @@ def is_valid_mais_rapido(board: list[list[int]], linha: int, coluna:int) -> bool
     # checando coluna
     if not checa_setor(col):
         return False
-    # checando começo do setor
+    # checando qual o começo do setor
     if linha < 3:
         comeco_linha = 0
     elif linha < 6:
@@ -129,11 +131,10 @@ def checa_setor(setor: list[int]):
     Verifica se há números repetidos em uma lista,
     tirando os números 0 (célula vazia)
     """
-    for i in range(0, len(setor)):
-        for j in range(i+1, len(setor)):
-            if setor[i] != 0 and setor[i] == setor[j]:
-                return False
-    return True
+    # Colocar os números de setor em numeros, desde que eles sejam diferentes de 0
+    numeros = [x for x in setor if x != 0]
+    # Verifica se tem algum número repetido
+    return len(numeros) == len(set(numeros))
 
 def faz_quadrado(board: list[list[int]], linha_inicio: int, coluna_inicio: int) -> list[int]:
     """
@@ -148,25 +149,34 @@ def faz_quadrado(board: list[list[int]], linha_inicio: int, coluna_inicio: int) 
 
 def is_valid(board: list[list[int]]) -> bool:
     """Checks if the board is valid"""
+    # Se o tabuleiro não tiver 9 linhas
     if len(board) != 9:
         return False
     for i in range(0, 9):
+        # se o tabuleiro não tiver 9 colunas
         if len(board[i]) != 9:
             return False
         coluna = []
+        # percorre as colunas
         for j in range (0, 9):
+            # adiciona na coluna
             coluna.append(board[j][i])
+            # checa se o valor da célula é um número inteiro, se não for, checa se o número é
+            # maior que 9 ou menor que 0
             if type(board[i][j]) is not int:
                 return False
             elif board[i][j] > 9 or board[i][j] < 0:
                 return False
+        # Checa linha
         if not checa_setor(board[i]):
             return False
+        # Checa coluna
         if not checa_setor(coluna):
             return False
+    # percorre linhas e colunas de 3 em 3 para formar os quadrados
     for i in range(0, 9, 3):
         for j in range(0, 9, 3):
+            # checa os quadrados
             if not checa_setor(faz_quadrado(board, i, j)):
                 return False
-
     return True
