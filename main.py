@@ -47,13 +47,20 @@ def testa_possibilidades(board) -> dict[list[int]]:
             # Se a célula estiver vazia, calcula as possibilidades
             if novo_board[i][j] == 0:
                 possibilidades = []
+                # Variável para checar se tem de fato alguma possibilidade pra célula vazia
+                tem_possibilidades = False
                 # As possibilidades vão dos números 1 a 9
                 for teste in range(1, 10):
                     # Altera o tabuleiro para fazer o teste
                     novo_board[i][j] = teste
                     # Se retornar como válido, adiciona o teste nas possibilidades
                     if is_valid_mais_rapido(novo_board, i, j):
+                        # Marca que tem alguma possibilidade para a célula vazia
+                        tem_possibilidades = True
                         possibilidades.append(teste)
+                # Se tiver alguma célula vazia sem possibilidades, o programa retorna False
+                if not tem_possibilidades:
+                    return False
                 novo_board[i][j] = 0
                 # Adiciona as coordenadas da célula e suas possibilidades no dcionário
                 if len(possibilidades) > 0:
@@ -97,9 +104,11 @@ def recursao(board, dicio_possibilidades):
             # da lista que ele está percorrendo
             novo_board[coordenadas[0]][coordenadas[1]] = teste
             # recalcula as possibilidades
+            print(dicio_possibilidades)
             novo_dicio_possibilidades = testa_possibilidades(novo_board)
+            assert id(novo_dicio_possibilidades) != id(dicio_possibilidades)
             # verificando se não há mais possibilidades
-            if len(novo_dicio_possibilidades) == 0:
+            if not novo_dicio_possibilidades:
                 # se não há mais possibilidades e não há mais zeros na borda
                 # então ele concluiu o sudoku
                 if nao_tem_mais_zero(novo_board):
@@ -113,11 +122,11 @@ def recursao(board, dicio_possibilidades):
                 # ache a solução) ou simplesmente não vai retornar
                 # nada e então o for continua percorrendo as outras
                 # possibilidades
+                # tem que checar se alguma coordenada com 0 tem 0 possibilidades
                 result = recursao(novo_board, novo_dicio_possibilidades)
                 # se a função retornar um tabuleiro, então ele retorna
                 # o tabuleiro
-                if result != None:
-                    return result
+                return result
 
 def solve_sudoku(board: list[list[int]]) -> list[list[int]]:
     """Solves the board"""
@@ -180,3 +189,18 @@ def is_valid(board: list[list[int]]) -> bool:
             if not checa_setor(faz_quadrado(board, i, j)):
                 return False
     return True
+
+if __name__ == "__main__":
+    tab1 = [[2, 4, 0, 0, 0, 0, 0, 8, 0], [0, 0, 0, 0, 9, 8, 0, 2, 3], [0, 8, 9, 5, 2, 0, 0, 0, 0], [0, 7, 0, 3, 8, 0, 0, 0, 4], [8, 0, 2, 7, 0, 6, 0, 1, 0], [0, 0, 0, 0, 5, 0, 0, 7, 0], [0, 0, 7, 0, 0, 0, 0, 0, 0], [0, 0, 4, 0, 0, 0, 1, 0, 7], [9, 3, 8, 1, 7, 4, 0, 0, 0]]
+    tab2 = [
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    ]
+    print(solve_sudoku(tab2))
