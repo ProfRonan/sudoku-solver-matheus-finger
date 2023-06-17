@@ -2,6 +2,72 @@
 
 import copy
 
+def checa_setor(setor: list[int]):
+    """
+    Verifica se há números repetidos em uma lista,
+    tirando os números 0 (célula vazia)
+    """
+    # Colocar os números de setor em numeros, desde que eles sejam diferentes de 0
+    numeros = [x for x in setor if x != 0]
+    # Verifica se tem algum número repetido
+    return len(numeros) == len(set(numeros))
+
+def faz_quadrado(board: list[list[int]], linha_inicio: int, coluna_inicio: int) -> list[int]:
+    """
+    Faz um setor quadrado a partir de coordenadas do inicio
+    e final da linha
+    """
+    quadrado = []
+    for i in range(linha_inicio, linha_inicio+3):
+        for j in range(coluna_inicio, coluna_inicio+3):
+            quadrado.append(board[i][j])
+    return quadrado
+
+
+def nao_tem_mais_zero(board) -> bool:
+    """
+    Verifica se ainda há 0 no tabuleiro.
+    """
+    for i in range(0, 9):
+        for j in range(0, 9):
+            if board[i][j] == 0:
+                return False
+    return True
+
+def is_valid(board: list[list[int]]) -> bool:
+    """Checks if the board is valid"""
+    # Se o tabuleiro não tiver 9 linhas
+    if len(board) != 9:
+        return False
+    for i in range(0, 9):
+        # se o tabuleiro não tiver 9 colunas
+        if len(board[i]) != 9:
+            return False
+        coluna = []
+        # percorre as colunas
+        for j in range (0, 9):
+            # adiciona na coluna
+            coluna.append(board[j][i])
+            # checa se o valor da célula é um número inteiro, se não for, checa se o número é
+            # maior que 9 ou menor que 0
+            if type(board[i][j]) is not int:
+                return False
+            elif board[i][j] > 9 or board[i][j] < 0:
+                return False
+        # Checa linha
+        if not checa_setor(board[i]):
+            return False
+        # Checa coluna
+        if not checa_setor(coluna):
+            return False
+    # percorre linhas e colunas de 3 em 3 para formar os quadrados
+    for i in range(0, 9, 3):
+        for j in range(0, 9, 3):
+            # checa os quadrados
+            if not checa_setor(faz_quadrado(board, i, j)):
+                return False
+    return True
+
 def is_valid_mais_rapido(board: list[list[int]], linha: int, coluna:int) -> bool: 
     """Checa se a jogada é válida.
     Ou seja, vê se uma alteração é válida checado a linha, a coluna e o setor da célula após a jogada.
@@ -17,18 +83,8 @@ def is_valid_mais_rapido(board: list[list[int]], linha: int, coluna:int) -> bool
     if not checa_setor(col):
         return False
     # checando qual o começo do setor
-    if linha < 3:
-        comeco_linha = 0
-    elif linha < 6:
-        comeco_linha = 3
-    else:
-        comeco_linha = 6
-    if coluna < 3:
-        comeco_coluna = 0
-    elif coluna < 6:
-        comeco_coluna = 3
-    else:
-        comeco_coluna = 6
+    comeco_linha = (linha // 3) * 3
+    comeco_coluna = (coluna // 3) * 3
     # checando setor
     if not checa_setor(faz_quadrado(board, comeco_linha, comeco_coluna)):
         return False
@@ -72,15 +128,6 @@ def testa_possibilidades(board) -> dict[list[int]]:
         return dicio_organizado
     return dicio_possibilidades_testa
 
-def nao_tem_mais_zero(board) -> bool:
-    """
-    Verifica se ainda há 0 no tabuleiro.
-    """
-    for i in range(0, 9):
-        for j in range(0, 9):
-            if board[i][j] == 0:
-                return False
-    return True
 
 def recursao(board, dicio_possibilidades):
     """
@@ -104,7 +151,6 @@ def recursao(board, dicio_possibilidades):
             # da lista que ele está percorrendo
             novo_board[coordenadas[0]][coordenadas[1]] = teste
             # recalcula as possibilidades
-            print(dicio_possibilidades)
             novo_dicio_possibilidades = testa_possibilidades(novo_board)
             assert id(novo_dicio_possibilidades) != id(dicio_possibilidades)
             # verificando se não há mais possibilidades
@@ -135,72 +181,18 @@ def solve_sudoku(board: list[list[int]]) -> list[list[int]]:
     # utiliza método recursão que retorna o tabuleiro feito
     return recursao(board, dicio_possibilidades)
 
-def checa_setor(setor: list[int]):
-    """
-    Verifica se há números repetidos em uma lista,
-    tirando os números 0 (célula vazia)
-    """
-    # Colocar os números de setor em numeros, desde que eles sejam diferentes de 0
-    numeros = [x for x in setor if x != 0]
-    # Verifica se tem algum número repetido
-    return len(numeros) == len(set(numeros))
 
-def faz_quadrado(board: list[list[int]], linha_inicio: int, coluna_inicio: int) -> list[int]:
-    """
-    Faz um setor quadrado a partir de coordenadas do inicio
-    e final da linha
-    """
-    quadrado = []
-    for i in range(linha_inicio, linha_inicio+3):
-        for j in range(coluna_inicio, coluna_inicio+3):
-            quadrado.append(board[i][j])
-    return quadrado
-
-def is_valid(board: list[list[int]]) -> bool:
-    """Checks if the board is valid"""
-    # Se o tabuleiro não tiver 9 linhas
-    if len(board) != 9:
-        return False
-    for i in range(0, 9):
-        # se o tabuleiro não tiver 9 colunas
-        if len(board[i]) != 9:
-            return False
-        coluna = []
-        # percorre as colunas
-        for j in range (0, 9):
-            # adiciona na coluna
-            coluna.append(board[j][i])
-            # checa se o valor da célula é um número inteiro, se não for, checa se o número é
-            # maior que 9 ou menor que 0
-            if type(board[i][j]) is not int:
-                return False
-            elif board[i][j] > 9 or board[i][j] < 0:
-                return False
-        # Checa linha
-        if not checa_setor(board[i]):
-            return False
-        # Checa coluna
-        if not checa_setor(coluna):
-            return False
-    # percorre linhas e colunas de 3 em 3 para formar os quadrados
-    for i in range(0, 9, 3):
-        for j in range(0, 9, 3):
-            # checa os quadrados
-            if not checa_setor(faz_quadrado(board, i, j)):
-                return False
-    return True
 
 if __name__ == "__main__":
-    tab1 = [[2, 4, 0, 0, 0, 0, 0, 8, 0], [0, 0, 0, 0, 9, 8, 0, 2, 3], [0, 8, 9, 5, 2, 0, 0, 0, 0], [0, 7, 0, 3, 8, 0, 0, 0, 4], [8, 0, 2, 7, 0, 6, 0, 1, 0], [0, 0, 0, 0, 5, 0, 0, 7, 0], [0, 0, 7, 0, 0, 0, 0, 0, 0], [0, 0, 4, 0, 0, 0, 1, 0, 7], [9, 3, 8, 1, 7, 4, 0, 0, 0]]
-    tab2 = [
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
+    tab = [
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0]
     ]
-    print(solve_sudoku(tab2))
+    print(solve_sudoku(tab))
